@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Print</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #ff8DA1
+}
+
+/* ---------- HEADER ---------- */
+header {
+  background: transparent;
+  padding: 2rem 2rem;
+}
+
+h1 {
+  text-align: center;
+  font-size: 3rem;          
+  font-weight: 1000;
+ -webkit-text-stroke: 3px white;
+}
+
+
+/* ---------- NAV ---------- */
+nav {
+  text-align: center;
+}
+
+nav a {
+  color: #ff46A2;
+  margin-left: 1rem;
+  text-decoration: none;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: text-shadow 0.2s ease, transform 0.2s ease;
+}
+
+nav a:hover {
+  text-shadow: 0 0 8px #ff46A2, 0 0 16px rgba(255, 70, 162, 0.6);
+  transform: translateY(-1px);
+}
+
+/* GALLERY */
+.gallery {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.gallery img {
+  width: 100%;
+  cursor: pointer;
+}
+
+/* OVERLAY */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.95);
+  z-index: 1000;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+/* CENTERED CONTENT */
+.overlay-inner {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-content {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  max-width: 1100px;
+  width: 100%;
+  padding: 40px;
+}
+
+/* IMAGE AREA */
+.image-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.image-wrapper img {
+  max-width: 600px;
+  max-height: 80vh;
+}
+
+/* ARROWS */
+.arrow {
+  font-size: 40px;
+  cursor: pointer;
+  user-select: none;
+  padding: 0 20px;
+  display: none;
+}
+
+/* TEXT */
+.info {
+  max-width: 300px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .overlay-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .info {
+    max-width: 100%;
+  }
+
+  .arrow {
+    padding: 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+  <h1> ☆ DARBY JAHN ☆ </h1>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="contact.html">Contact</a>
+    <a href="print.html">Print</a>
+    <a href="painting.html">Painting</a>
+    <a href="media.html">Media</a>
+  </nav>
+
+<div class="gallery">
+  <img src="images/print1.jpeg" onclick="openOverlay('print1', 'Untitled', 'Oil on canvas', '2023')">
+  <img src="images/print2.jpeg" onclick="openOverlay('print2', 'Study', 'Acrylic on canvas', '2022')">
+  <img src="images/print3.jpeg" onclick="openOverlay('print3', 'Landscape', 'Oil on panel', '2021')">
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="close" onclick="closeOverlay()">×</div>
+
+  <div class="overlay-inner">
+    <div class="overlay-content">
+
+      <div class="arrow" id="prev" onclick="changeImage(-1)">‹</div>
+
+      <div class="image-wrapper">
+        <img id="overlayImg">
+      </div>
+
+      <div class="arrow" id="next" onclick="changeImage(1)">›</div>
+
+      <div class="info">
+        <h2 id="title"></h2>
+        <p id="medium"></p>
+        <p id="year"></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+let imageList = [];
+let currentIndex = 0;
+let baseName = "";
+
+function openOverlay(name, title, medium, year) {
+  baseName = name;
+  imageList = [];
+  currentIndex = 0;
+
+  // Try loading a, b, c, d versions automatically
+  const letters = ["a","b","c","d","e"];
+  let loaded = 0;
+
+  letters.forEach(letter => {
+    const img = new Image();
+    img.src = `images/${baseName}${letter}.jpeg`;
+    img.onload = () => {
+      imageList.push(img.src);
+      loaded++;
+      finalizeOverlay();
+    };
+  });
+
+  // Fallback if no a/b version exists
+  setTimeout(() => {
+    if (imageList.length === 0) {
+      imageList.push(`images/${baseName}.jpeg`);
+      finalizeOverlay();
+    }
+  }, 200);
+
+  document.getElementById("title").innerText = title;
+  document.getElementById("medium").innerText = medium;
+  document.getElementById("year").innerText = year;
+}
+
+function finalizeOverlay() {
+  document.getElementById("overlayImg").src = imageList[currentIndex];
+  document.getElementById("overlay").style.display = "block";
+
+  document.getElementById("prev").style.display =
+  document.getElementById("next").style.display =
+    imageList.length > 1 ? "block" : "none";
+}
+
+function changeImage(dir) {
+  currentIndex = (currentIndex + dir + imageList.length) % imageList.length;
+  document.getElementById("overlayImg").src = imageList[currentIndex];
+}
+
+function closeOverlay() {
+  document.getElementById("overlay").style.display = "none";
+}
+</script>
+
+</body>
+</html>
