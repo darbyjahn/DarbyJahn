@@ -97,27 +97,18 @@ svg {
   position: fixed;
   left: 0;
   top: 0;
-  height: 100vh;
-  width: auto;
-  z-index: 1;
-  pointer-events: none;
+  height: 900px;
 }
 
 #guyarm{
   position: fixed;
   left: 0;
   top: 0;
-  height: 100vh;
-  width: auto;
-  display: none;
-  pointer-events: none;
-  z-index: 10;
+  height: 900px;
 }
 
 #earAnchor{
   position:fixed;
-  left:200px;   /* adjust */
-  top:385px;    /* adjust */
   width:10px;
   height:10px;
   pointer-events:none;
@@ -142,6 +133,8 @@ svg {
 
 <h2>Drag phone to ear to contact.</h2>
 
+<div id="scene">
+
 <svg aria-hidden="true">
   <path id="cord"></path>
 </svg>
@@ -153,17 +146,10 @@ svg {
 <img id="guyarm" src="media/guyarm.png" alt="">
 <div id="earAnchor"></div>
 
+</div>
+
 <script>
-window.addEventListener("load", () => {
-
-const guy = document.getElementById("guy");
-const guyarm = document.getElementById("guyarm");
-const earAnchor = document.getElementById("earAnchor");
-
-guyarm.style.display = "none";
-
 let grabbedByGuy = false;
-
 let phoneRotation = 0;
 const EAR_ROTATION = 10; // angle when on ear
 
@@ -191,86 +177,124 @@ let BASE_CORD_OFFSET = { x: 0.45, y: 0.97 };
 let PHONE_CORD_OFFSET_FRONT = { x: 0.45, y: 0.95 };
 let PHONE_CORD_OFFSET_BACK  = { x: 0.45, y: 0.95 };
 
-// ===== ELEMENTS =====
-const phone = document.getElementById("phone");
-const phonebase = document.getElementById("phonebase");
-const cord = document.getElementById("cord");
+let SCALE = 1;
 
-// ===== STATE =====
+// ===== ELEMENT VARIABLES =====
+let guy, guyarm, earAnchor, phone, phonebase, cord, scene;
+
+// ===== STATE VARIABLES =====
 let phonePos = { x: 0, y: 0 };
-let phoneVel = { x:0, y:0 };
+let phoneVel = { x: 0, y: 0 };
 let isMouseDown = false;
 let offset = { x:0, y:0 };
 let docked = true;
+let dockTarget = { x: phonePos.x, y: phonePos.y };
 let dockingProgress = 0;
 
 let points = [];
 let prevPoints = [];
 
-// start phone on base
-const baseRect = phonebase.getBoundingClientRect();
-phonePos.x = baseRect.left + baseRect.width/2 - phone.offsetWidth/2;
-phonePos.y = baseRect.top + baseRect.height/2 - phone.offsetHeight/2;
-phone.src = "media/phoneback.png";
+window.addEventListener("load", () => {
 
-// ===== INIT ROPE =====
+  // ===== ELEMENTS =====
+  guy = document.getElementById("guy");
+  guyarm = document.getElementById("guyarm");
+  earAnchor = document.getElementById("earAnchor");
+  phone = document.getElementById("phone");
+  phonebase = document.getElementById("phonebase");
+  cord = document.getElementById("cord");
+  scene = document.getElementById("scene");
+
+  // hide guy arm initially
+  guyarm.style.display = "none";
+
+  // start phone on base
+  const baseRect = phonebase.getBoundingClientRect();
+  phonePos.x = baseRect.left + baseRect.width/2 - phone.offsetWidth/2;
+  phonePos.y = baseRect.top + baseRect.height/2 - phone.offsetHeight/2;
+  phone.src = "media/phoneback.png";
+
+  // initialize rope
+  initRope();
+  updateResponsiveScale(); // initial scaling
+
+  // ===== DRAG EVENTS =====
+  phone.addEventListener("mousedown", e=>{
+    e.preventDefault();
+
+    if(grabbedByGuy){
+      grabbedByGuy = false;
+      guyarm.style.display = "none";
+    }
+
+    isMouseDown = true;
+    docked = false;
+    dockingProgress = 0;
+    phoneRotation = 0;
+    phone.src = "media/phone.png";
+
+    offset.x = e.clientX - phonePos.x;
+    offset.y = e.clientY - phonePos.y;
+  });
+
+  window.addEventListener("mouseup", ()=>{
+    isMouseDown = false;
+  });
+
+  window.addEventListener("mousemove", e=>{
+    if(!isMouseDown) return;
+    phonePos.x = e.clientX - offset.x;
+    phonePos.y = e.clientY - offset.y;
+    phoneVel.x = 0;
+    phoneVel.y = 0;
+  });
+
+  // ===== START ANIMATION =====
+  animate();
+});
+
+// ===== RESPONSIVE SCALE =====
+function updateResponsiveScale(){
+  const DESIGN_HEIGHT = 900;
+  SCALE = Math.min(window.innerHeight / DESIGN_HEIGHT, 1);
+
+  guy.style.height = (900 * SCALE) + "px";
+  guyarm.style.height = (900 * SCALE) + "px";
+  earAnchor.style.left = (200 * SCALE) + "px";
+  earAnchor.style.top  = (385 * SCALE) + "px";
+  phone.style.width = (240 * SCALE) + "px";
+  phonebase.style.width = (250 * SCALE) + "px";
+
+  const baseRect = phonebase.getBoundingClientRect();
+  if(docked){
+    dockTarget.x = baseRect.left + baseRect.width/2 - phone.offsetWidth/2;
+    dockTarget.y = baseRect.top + baseRect.height/2 - phone.offsetHeight/2;
+  }
+
+  cord.setAttribute("stroke-width", 6 * SCALE);
+  initRope();
+}
+window.addEventListener("resize", updateResponsiveScale);
+
+// ===== ROPE INITIALIZATION =====
 function initRope() {
   const baseRect = phonebase.getBoundingClientRect();
   const anchorX = baseRect.left + baseRect.width * BASE_CORD_OFFSET.x;
   const anchorY = baseRect.top + baseRect.height * BASE_CORD_OFFSET.y;
-  const phoneWidth = phone.offsetWidth;
-  const phoneHeight = phone.offsetHeight;
 
   points = [];
   prevPoints = [];
   for (let i=0;i<SEGMENTS;i++){
     const t = i/(SEGMENTS-1);
-    const x = anchorX*(1-t) + (phonePos.x+phoneWidth*PHONE_CORD_OFFSET_FRONT.x)*t;
-    const y = anchorY*(1-t) + (phonePos.y+phoneHeight*PHONE_CORD_OFFSET_FRONT.y)*t;
+    const x = anchorX*(1-t) + (phonePos.x+phone.offsetWidth*PHONE_CORD_OFFSET_FRONT.x)*t;
+    const y = anchorY*(1-t) + (phonePos.y+phone.offsetHeight*PHONE_CORD_OFFSET_FRONT.y)*t;
     points.push({x,y,z:0});
     prevPoints.push({x,y,z:0});
   }
 }
-initRope();
-
-// ===== DRAG =====
-phone.addEventListener("mousedown", e=>{
-  e.preventDefault();
-
-  // RELEASE FROM GUY
-  if(grabbedByGuy){
-    grabbedByGuy = false;
-    guyarm.style.display = "none";
-  }
-
-  isMouseDown = true;
-  docked = false;
-  dockingProgress = 0;
-
-  phoneRotation = 0;
-  phone.src = "media/phone.png";
-
-  offset.x = e.clientX - phonePos.x;
-  offset.y = e.clientY - phonePos.y;
-});
-
-window.addEventListener("mouseup", ()=>{
-  isMouseDown = false;
-});
-
-window.addEventListener("mousemove", e=>{
-  if(!isMouseDown) return;
-
-  phonePos.x = e.clientX - offset.x;
-  phonePos.y = e.clientY - offset.y;
-
-  phoneVel.x = 0;
-  phoneVel.y = 0;
-});
 
 // ===== PHYSICS =====
 function updatePhysics() {
-  // top anchor
   const baseRect = phonebase.getBoundingClientRect();
   const anchor = {
     x: baseRect.left + baseRect.width*BASE_CORD_OFFSET.x,
@@ -279,7 +303,6 @@ function updatePhysics() {
   points[0].x = anchor.x;
   points[0].y = anchor.y;
 
-  // docking
   const phoneRect = phone.getBoundingClientRect();
   const baseCenterX = baseRect.left + baseRect.width/2;
   const baseCenterY = baseRect.top + baseRect.height/2;
@@ -287,14 +310,16 @@ function updatePhysics() {
   const phoneCenterY = phoneRect.top + phoneRect.height/2;
   const dist = Math.hypot(phoneCenterX - baseCenterX, phoneCenterY - baseCenterY);
 
-  if(!isMouseDown && dist < DOCK_RADIUS){
+  // smooth dock
+  const targetX = docked ? dockTarget.x : baseCenterX - phone.offsetWidth/2;
+  const targetY = docked ? dockTarget.y : baseCenterY - phone.offsetHeight/2;
+  phonePos.x += (targetX - phonePos.x) * 0.15;
+  phonePos.y += (targetY - phonePos.y) * 0.15;
+  phoneVel.x *= 0.3;
+  phoneVel.y *= 0.3;
+
+  if(!isMouseDown && !grabbedByGuy && dist < DOCK_RADIUS){
     dockingProgress = Math.min(1, dockingProgress + DOCK_LERP);
-    const targetX = baseCenterX - phone.offsetWidth/2;
-    const targetY = baseCenterY - phone.offsetHeight/2;
-    phonePos.x += (targetX - phonePos.x) * dockingProgress;
-    phonePos.y += (targetY - phonePos.y) * dockingProgress;
-    phoneVel.x *= 0.3;
-    phoneVel.y *= 0.3;
     if(dockingProgress > 0.98 && !docked){
       docked = true;
       phone.src = "media/phoneback.png";
@@ -315,51 +340,34 @@ function updatePhysics() {
     }
   }
 
-// ===== GUY GRAB =====
+  // guy grab
+  const earRect = earAnchor.getBoundingClientRect();
+  const guyGrabX = earRect.left;
+  const guyGrabY = earRect.top;
+  const distGuy = Math.hypot(phoneCenterX - guyGrabX, phoneCenterY - guyGrabY);
 
-const earRect = earAnchor.getBoundingClientRect();
-
-const guyGrabX = earRect.left;
-const guyGrabY = earRect.top;
-
-const distGuy = Math.hypot(phoneCenterX - guyGrabX, phoneCenterY - guyGrabY);
-
-if(!grabbedByGuy && !docked && !isMouseDown && distGuy < 120){
-
-  grabbedByGuy = true;
-  isMouseDown = false;
-
-  phoneVel.x = 0;
-  phoneVel.y = 0;
-
-  // SNAP TO EAR
-  phonePos.x = guyGrabX - phone.offsetWidth/2;
-  phonePos.y = guyGrabY - phone.offsetHeight/2;
-
-  phoneRotation = EAR_ROTATION;
-
-  guyarm.style.display = "block";
-}
-
-// LOCK PHONE TO EAR
-if(grabbedByGuy){
-
-  phonePos.x = guyGrabX - phone.offsetWidth/2;
-  phonePos.y = guyGrabY - phone.offsetHeight/2;
-
-  const distAway = Math.hypot(
-    phoneCenterX - guyGrabX,
-    phoneCenterY - guyGrabY
-  );
-
-  if(distAway > 160){
-    grabbedByGuy = false;
-    guyarm.style.display = "none";
+  if(!grabbedByGuy && !docked && !isMouseDown && distGuy < 120){
+    grabbedByGuy = true;
+    isMouseDown = false;
+    phoneVel.x = 0;
+    phoneVel.y = 0;
+    phonePos.x = guyGrabX - phone.offsetWidth/2;
+    phonePos.y = guyGrabY - phone.offsetHeight/2;
+    phoneRotation = EAR_ROTATION;
+    guyarm.style.display = "block";
   }
 
-}
+  if(grabbedByGuy){
+    phonePos.x = guyGrabX - phone.offsetWidth/2;
+    phonePos.y = guyGrabY - phone.offsetHeight/2;
+    const distAway = Math.hypot(phoneCenterX - guyGrabX, phoneCenterY - guyGrabY);
+    if(distAway > 160){
+      grabbedByGuy = false;
+      guyarm.style.display = "none";
+    }
+  }
 
-  // verlet integration for internal points
+  // verlet integration
   const end = points.length-1;
   for(let i=1;i<end;i++){
     const p = points[i];
@@ -371,65 +379,41 @@ if(grabbedByGuy){
     p.x += vx; p.y += vy; p.z += vz;
   }
 
- // constraints
-for(let k=0;k<1200;k++){
+  // constraints
+  for(let k=0;k<1200;k++){
+    points[0].x = anchor.x;
+    points[0].y = anchor.y;
+    const attachOffset = docked ? PHONE_CORD_OFFSET_BACK : PHONE_CORD_OFFSET_FRONT;
+    points[end].x = phonePos.x + phone.offsetWidth * attachOffset.x;
+    points[end].y = phonePos.y + phone.offsetHeight * attachOffset.y;
 
-  // lock both ends FIRST
-  points[0].x = anchor.x;
-  points[0].y = anchor.y;
-
-  const attachOffset = docked ? PHONE_CORD_OFFSET_BACK : PHONE_CORD_OFFSET_FRONT;
-  points[end].x = phonePos.x + phone.offsetWidth * attachOffset.x;
-  points[end].y = phonePos.y + phone.offsetHeight * attachOffset.y;
-
-  for(let i=0;i<end;i++){
-    const p1 = points[i];
-    const p2 = points[i+1];
-
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    const dz = p2.z - p1.z;
-
-    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
-    let targetLength = SEGMENT_LENGTH;
-let stiffness = 1;
-
-// make last section stiffer
-if(i > end - TAIL_SEGMENTS){
-  targetLength = SEGMENT_LENGTH; 
-  stiffness = TAIL_STIFFNESS;
-}
-
-const diff = (dist - targetLength) / dist;
-
-    // don't move pinned points
-    if(i !== 0){
-      p1.x += dx * 0.5 * diff * stiffness;
-      p1.y += dy * 0.5 * diff * stiffness;
-      p1.z += dz * 0.5 * diff * stiffness;
-    }
-
-    if(i+1 !== end){
-      p2.x -= dx * 0.5 * diff * stiffness;
-      p2.y -= dy * 0.5 * diff * stiffness;
-      p2.z -= dz * 0.5 * diff * stiffness;
+    for(let i=0;i<end;i++){
+      const p1 = points[i];
+      const p2 = points[i+1];
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const dz = p2.z - p1.z;
+      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
+      let targetLength = SEGMENT_LENGTH;
+      let stiffness = 1;
+      if(i > end - TAIL_SEGMENTS){ stiffness = TAIL_STIFFNESS; }
+      const diff = (dist - targetLength) / dist;
+      if(i !== 0){ p1.x += dx * 0.5 * diff * stiffness; p1.y += dy * 0.5 * diff * stiffness; p1.z += dz * 0.5 * diff * stiffness; }
+      if(i+1 !== end){ p2.x -= dx * 0.5 * diff * stiffness; p2.y -= dy * 0.5 * diff * stiffness; p2.z -= dz * 0.5 * diff * stiffness; }
     }
   }
 }
-}
+
 // ===== DRAW CORD =====
 function drawCord() {
   let d = `M ${points[0].x} ${points[0].y}`;
   for(let i=1;i<points.length;i++){
     const p = points[i];
     const prev = points[i-1];
-if(
-  i < STRAIGHT_SEGMENTS_BASE || 
-  i > points.length - TAIL_SEGMENTS
-){
-  d += ` L ${p.x} ${p.y}`;
-  continue;
-}
+    if(i < STRAIGHT_SEGMENTS_BASE || i > points.length - TAIL_SEGMENTS){
+      d += ` L ${p.x} ${p.y}`;
+      continue;
+    }
     const dx = p.x-prev.x;
     const dy = p.y-prev.y;
     const len = Math.hypot(dx,dy)||1;
@@ -445,9 +429,9 @@ if(
 
 // ===== UPDATE PHONE =====
 function updatePhone() {
-phone.style.left = phonePos.x + 'px';
-phone.style.top = phonePos.y + 'px';
-phone.style.transform = `rotate(${phoneRotation}deg)`;
+  phone.style.left = phonePos.x + 'px';
+  phone.style.top = phonePos.y + 'px';
+  phone.style.transform = `rotate(${phoneRotation}deg)`;
 }
 
 // ===== ANIMATION LOOP =====
@@ -457,12 +441,6 @@ function animate() {
   updatePhone();
   requestAnimationFrame(animate);
 }
-animate();
-
-
-
-});
 </script>
-
 </body>
 </html>
