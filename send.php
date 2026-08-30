@@ -34,7 +34,7 @@ $body .= "Email: $email\n\n";
 $body .= "Message:\n$message";
 
 // Headers: From is your domain, Reply-To is user email
-$headers  = "From: hale Gurland <no-reply@halegurland.com>\r\n";
+$headers  = "From: Darby Jahn <no-reply@darbyjahn.com>\r\n";
 $headers .= "Reply-To: $email\r\n";
 $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
@@ -46,6 +46,6 @@ if (mail($to, $subject, $body, $headers)) {
 } else {
     // Failure
     http_response_code(500);
-    echo "Message Failed... womp womp. Please try again later.";
+    echo "Message did not send... womp womp. Please try again.";
 }
 ?>

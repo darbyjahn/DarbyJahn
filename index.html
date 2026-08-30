@@ -30,7 +30,7 @@ BACKGROUND
 ========================= */
 
 body{
-    background:#fff url("images/bg.png") center/cover no-repeat;
+    background:#fff url("media/bg.png") center/cover no-repeat;
 }
 
 /* =========================
@@ -51,6 +51,7 @@ LEFT STACK
     font-size:1.6rem;
     letter-spacing:.15em;
     text-transform:uppercase;
+    color:#B5522A;
 }
 
 .main-nav{
@@ -58,6 +59,7 @@ LEFT STACK
     display:flex;
     flex-direction:column;
     gap:.8rem;
+    
 }
 
 .main-nav button{
@@ -67,6 +69,7 @@ LEFT STACK
     font-size:.95rem;
     letter-spacing:.15em;
     cursor:pointer;
+    color:#B5522A;
 }
 
 /* =========================
@@ -89,32 +92,126 @@ MAIN CONTENT AREA
 }
 
 /* =========================
-SUBFOLDER GRID (SMALL BOXES)
+SUBFOLDER THUMBNAILS
 ========================= */
 
 .subgrid{
     display:grid;
     grid-template-columns:repeat(3, 1fr);
-    gap:12px;
+    gap:40px 30px;
+    align-items:start;
 }
 
-.subtile{
+/* Individual folder */
 
-    border:1px solid #ddd;
-    background:#fff;
+.subtile{
+    border:none;
+    outline:none;
+    background:transparent;
+    padding:0;
+    margin:0;
 
     cursor:pointer;
 
-    padding:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 
     font-size:.75rem;
     text-transform:uppercase;
+    letter-spacing:.08em;
 
-    transition:.2s;
+    color:#B5522A;
+
+    transition:transform .25s ease;
 }
 
-.subtile:hover{
+/* Thumbnail area */
+
+.subtile-thumb{
+    width:100%;
+    height:150px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:transparent;
+
+    border:none;
+    outline:none;
+
+    overflow:visible;
+}
+
+/* Actual transparent thumbnail */
+
+.subtile-thumb img{
+    max-width:100%;
+    max-height:150px;
+
+    width:auto;
+    height:auto;
+
+    display:block;
+
+    object-fit:contain;
+
+    background:transparent;
+
+    border:none;
+    outline:none;
+
+    transition:
+        transform .35s cubic-bezier(.2,.8,.2,1),
+        filter .25s ease;
+}
+
+/* Hover animation */
+
+.subtile:hover .subtile-thumb img{
+    transform:
+        translateY(-10px)
+        rotate(-4deg)
+        scale(1.08);
+}
+
+/* Folder title */
+
+.subtile-title{
+    margin-top:12px;
+
+    text-align:center;
+
+    transition:
+        transform .25s ease,
+        letter-spacing .25s ease;
+}
+
+.subtile:hover .subtile-title{
     transform:translateY(-2px);
+    letter-spacing:.14em;
+}
+
+
+/* =========================
+MOBILE SUBFOLDER GRID
+========================= */
+
+@media(max-width:700px){
+
+    .subgrid{
+        grid-template-columns:repeat(2,1fr);
+        gap:30px 20px;
+    }
+
+    .subtile-thumb{
+        height:120px;
+    }
+
+    .subtile-thumb img{
+        max-height:120px;
+    }
 }
 
 /* =========================
@@ -124,22 +221,28 @@ IMAGE GRID
 .grid{
     display:grid;
     grid-template-columns:repeat(4, 1fr);
-    gap:10px;
+    gap:20px;
 }
 
 .thumb{
 
     cursor:pointer;
-    border:1px solid #eee;
-    background:#fff;
+    border:none;
+    background:transparent;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
 }
 
 .thumb img,
 .thumb video{
 
     width:100%;
-    height:110px;
-    object-fit:cover;
+    height:180px;
+    object-fit:contain;
     display:block;
 }
 
@@ -163,6 +266,138 @@ LIGHTBOX
 .modal video{
     max-width:92vw;
     max-height:92vh;
+}
+
+/* =========================
+CONTACT
+========================= */
+
+.contact-scene{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    z-index:5;
+}
+
+/* CONTACT CORD */
+
+.contact-scene svg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:8;
+}
+
+#cord{
+    fill:none;
+    stroke:#D30000;
+    stroke-width:4;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+/* PHONE */
+
+#phone{
+    position:fixed;
+    width:240px;
+    cursor:grab;
+    user-select:none;
+    z-index:9;
+    -webkit-user-drag:none;
+    touch-action:none;
+}
+
+#phone:active{
+    cursor:grabbing;
+}
+
+#phonebase{
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:250px;
+    z-index:7;
+    pointer-events:none;
+}
+
+/* PERSON */
+
+#guy{
+    position:fixed;
+    left:0;
+    bottom:0;
+    height:900px;
+    z-index:1;
+    pointer-events:none;
+}
+
+#guyarm{
+    position:fixed;
+    left:0;
+    bottom:0;
+    height:900px;
+    z-index:10;
+    pointer-events:none;
+}
+
+/* EAR */
+
+#earAnchor{
+    position:fixed;
+    width:20px;
+    height:20px;
+    pointer-events:none;
+}
+
+/* CONTACT FORM */
+
+.contact-form-container{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+
+    width:min(500px, 80%);
+    z-index:20;
+}
+
+.contact-form{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+}
+
+.contact-form input,
+.contact-form textarea{
+    width:100%;
+    padding:1rem;
+    font-size:1rem;
+    border:1px solid #999;
+    background:rgba(255,255,255,.85);
+    box-sizing:border-box;
+}
+
+.contact-form textarea{
+    height:160px;
+}
+
+.contact-form button{
+    padding:.5rem 1.4rem;
+    border:1px solid #000;
+    background:none;
+    cursor:pointer;
+    align-self:flex-end;
+}
+
+#sentCheck{
+    display:none;
+    margin-left:10px;
+    color:green;
 }
 
 /* =========================
@@ -194,13 +429,17 @@ MOBILE
 
     <h1 class="site-title">Darby<br>Jahn</h1>
 
-    <div class="main-nav">
+<div class="main-nav">
 
-        <button onclick="showSub('2d')">2D</button>
-        <button onclick="showSub('3d')">3D</button>
-        <button onclick="showSub('4d')">4D</button>
+    <button onclick="showSub('2d')">2D</button>
+    <button onclick="showSub('3d')">3D</button>
+    <button onclick="showSub('4d')">4D</button>
 
-    </div>
+    <button onclick="showContact()">CONTACT</button>
+    <button onclick="showCV()">CV</button>
+    <button onclick="showAbout()">ABOUT</button>
+
+</div>
 
 </div>
 
@@ -216,7 +455,7 @@ let currentImages = [];
 let currentIndex = 0;
 
 /* =========================
-LEVEL 1 → SUBFOLDERS
+SUBFOLDERS
 ========================= */
 
 function showSub(type){
@@ -227,14 +466,46 @@ function showSub(type){
 
     const grid = panel.querySelector(".subgrid");
 
-    items.forEach((item, i) => {
+    items.forEach((item) => {
 
         const div = document.createElement("div");
+
         div.className = "subtile";
 
-        div.innerHTML = item.title || "folder";
+        /*
+         * The Python script now provides
+         * the thumbnail directly as item.thumb
+         */
+
+        const thumbnail = item.thumb || "";
+
+
+        div.innerHTML = `
+
+            <div class="subtile-thumb">
+
+                <img
+                    src="${thumbnail}"
+                    alt="${item.title || "folder"}"
+                    draggable="false"
+                >
+
+            </div>
+
+            <div class="subtile-title">
+                ${item.title || "folder"}
+            </div>
+
+        `;
+
+
+        /*
+         * Clicking the thumbnail opens
+         * the folder's artwork.
+         */
 
         div.onclick = () => showGrid(item);
+
 
         grid.appendChild(div);
     });
@@ -265,6 +536,971 @@ function showGrid(folder){
 
         grid.appendChild(div);
     });
+}
+
+/* =========================
+ABOUT
+========================= */
+
+function showAbout(){
+
+    panel.innerHTML = `
+        <div class="info-page">
+
+            <h2>About</h2>
+
+            <div class="about-content">
+
+                <p>
+                    
+                </p>
+
+                <p>
+                    
+                </p>
+
+            </div>
+
+        </div>
+    `;
+}
+
+/* =========================
+CV
+========================= */
+
+function showCV(){
+
+    panel.innerHTML = `
+        <div class="info-page cv-page">
+
+            <h2>CV</h2>
+
+            <div class="cv-content">
+
+                <h3></h3>
+
+                <p> Education
+2021 - 2025	Oberlin College, Oberlin, OH
+Majors: Studio Art, Biology
+Minor: Chemistry
+Relevant Coursework: Biochemistry, Bioorganic Chemistry, Molecular Biology, Cell Biology & Biochemistry, Relief & Monotype, Intaglio & Lithography, Screen-printing
+
+2017-2021		  Millennium High School, New York, NY 
+
+Professional Experience Experience
+
+2024			 Head Cook, Oberlin Student Cooperative Association, Oberlin, OH
+
+
+2023 - Present	Stock Room Assistant, Oberlin College, Oberlin, OH, Assisted with the preparation of solutions and glassware for chemistry labs.
+
+	Reproducible Media Print Lab Monitor, Oberlin College, Oberlin, Assisted students with printmaking processes. Performed daily shop maintenance and enforced lab procedures.
+
+	Yeo Press, Oberlin College, Oberlin, OH, Fulfilled screen printing orders for school and community. Attended national printmaking conferences. Organized school and community events centered around reproducible media. 
+
+2023 - 2024	(Bio) Chemistry Committee Member, Oberlin College, Oberlin, OH Facilitated discussions between students and faculty. Contributed to the hiring process. Organized departmental events.
+
+
+2023	Print Lab Monitor, Manhattan Graphics Center, New York, NY, Served as a teacher assistant for printmaking classes. Performed daily shop maintenance.
+
+2022 - Present	Chemistry Lab TA, Oberlin College, Oberlin, OH, Provided instruction, supervision, and assistance to students during the lab portion of introductory chemistry courses. Graded lab reports and offered drop-in tutoring sessions.
+
+	Bike Co-op, Oberlin College, Oberlin, OH Volunteered to repair bikes for the Oberlin College community and local town. Organized events and designed posters.
+
+	Assistant to Master Printer, Oberlin College Reproducible Media Print Publishing Program, Oberlin, OH
+
+
+
+
+Research Experience
+
+2024	  Research Assistant Ghose Lab, City College of New York, New York, NY
+
+2023 – Present	Research Assistant, Pike Lab, Oberlin College, Oberlin, OH Worked on yeast and mammalian cell cultures. Conducted flow cytometry.
+
+2023	NSF – REU Participant City College of New York, New York, NY Participated in the REU program focusing on Biochemistry, Biophysics, and Biodesign. Conducted isothermal titration calorimetry. Primer design. Protein purification. Bacterial cell culture. 
+
+
+Commissioned Work
+
+2024	Graduating Senior Gift, Oberlin College Art History department, Oberlin OH
+
+Chalk-Walk T-Shirt printing and design, City of Oberlin, Oberlin, OH 
+
+Oberlin Student Cooperative Association T-Shirt Printing and Design, Oberlin Student Cooperative Association Alumni Office, Oberlin OH
+
+Porchella- T-shirt printing and design, Tank Cooperative, Oberlin, OH
+
+Tank Cooperative Pig Roast 5-layer T shirt Printing and design, Tank      Cooperative, Oberlin OH
+
+O-clipse T-Shirt printing and design, Oberlin College Office of  Communications, Oberlin, OH
+
+El Centro Volunteer Initiative Silent Auction Commissioned Print, El Centro Volunteer Initiative, Oberlin, OH
+
+Dandelion Romp T-Shirt Printing and Designs, Oberlin Folk Music Cooperation, Oberlin, OH
+
+Custom Oberlin Conservatory Recital Poster Printing and Design, Oberlin College Jazz Department, Oberlin, OH
+
+3-layer T-shirt Printing, El Centro Volunteer Initiative, Oberlin, OH
+
+Oberlin Circus T-Shirt and shorts printing and design, O-Circus, Oberlin, OH
+
+
+
+Portfolio Exchanges and Exhibitions 
+
+2024			Junior Capstone Show, Fischer Gallery, Oberlin, OH
+	          
+El Centro Volunteer Initiative Gala, First Church Gallery, Oberlin OH
+
+2023			Art Walk, Venturi Art Building, Oberlin, OH
+ 
+2022			El Centro Volunteer Initiative Gala, First Church Gallery, Oberlin OH
+
+Art Hop, Venturi Art Building, Oberlin, OH
+
+Art Walk, Venturi Art Building, Oberlin, OH
+
+2021			Art Walk, Venturi Art Building, Oberlin, OH
+
+Presentations
+
+2024	Oberlin College Undergraduate Research Presentation Oberlin, Ohio
+
+2023	REU Undergraduate Research poster presentation City College Of New York, New York, NY 
+
+
+                    
+                </p>
+
+                <h3></h3>
+
+                <p>
+                    
+                </p>
+
+                <h3></h3>
+
+                <p>
+                   
+                </p>
+
+            </div>
+
+        </div>
+    `;
+}
+
+/* =========================
+Contact 
+========================= */
+
+function showContact(){
+
+    panel.innerHTML = `
+
+        <div class="contact-scene">
+
+            <svg aria-hidden="true">
+                <path id="cord"></path>
+            </svg>
+
+            <img id="phone"
+                 src="media/phone.png"
+                 alt="Phone"
+                 draggable="false">
+
+            <img id="phonebase"
+                 src="media/phonebase.png"
+                 alt="Phone Base">
+
+            <img id="guy"
+                 src="media/guy.png"
+                 alt="">
+
+            <img id="guyarm"
+                 src="media/guyarm.png"
+                 alt="">
+
+            <div id="earAnchor"></div>
+
+            <div class="contact-form-container">
+
+                <form id="contactForm" class="contact-form">
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Name"
+                        required
+                    >
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email address *"
+                        required
+                    >
+
+                    <textarea
+                        name="message"
+                        placeholder="Your message"
+                        required
+                    ></textarea>
+
+                    <button type="submit">Send</button>
+
+                    <span id="sentCheck">
+                        ✓ Message sent
+                    </span>
+
+                </form>
+
+            </div>
+
+        </div>
+    `;
+
+    const phone = document.getElementById("phone");
+    const phonebase = document.getElementById("phonebase");
+    const guy = document.getElementById("guy");
+
+    Promise.all([
+        new Promise(resolve => {
+            if (phone.complete) resolve();
+            else phone.onload = resolve;
+        }),
+        new Promise(resolve => {
+            if (phonebase.complete) resolve();
+            else phonebase.onload = resolve;
+        }),
+        new Promise(resolve => {
+            if (guy.complete) resolve();
+            else guy.onload = resolve;
+        })
+    ]).then(() => {
+        initContact();
+    });
+}
+
+function initContact(){
+
+const scene = document.querySelector(".contact-scene");
+
+    const contactBlock = document.querySelector(".contact-form-container");
+
+    const guy = document.getElementById("guy");
+    
+    const guyarm = document.getElementById("guyarm");
+    const earAnchor = document.getElementById("earAnchor");
+    const phone = document.getElementById("phone");
+    const phonebase = document.getElementById("phonebase");
+    const cord = document.getElementById("cord");
+
+    let grabbedByGuy = false;
+    let phoneRotation = 0;
+
+    const EAR_ROTATION = 10;
+
+    let phonePos = { x: 0, y: 0 };
+    let phoneVel = { x: 0, y: 0 };
+
+    let isMouseDown = false;
+    let pointerId = null;
+
+    let offset = { x: 0, y: 0 };
+
+    let docked = true;
+    let dockingProgress = 0;
+
+    const DOCK_RADIUS = 55;
+    const DOCK_LERP = 0.16;
+
+    const GRAVITY = 0.9;
+    const DAMPING = 0.97;
+
+   const SEGMENTS = 500;
+const SEGMENT_LENGTH = 0.7;
+
+const STRAIGHT_SEGMENTS_BASE = 60;
+
+const TAIL_SEGMENTS = 10;
+const TAIL_STIFFNESS = 0.2;
+
+const COIL_RADIUS_BASE = 15;
+const COILS = 50;
+const DEPTH_BASE = 6;
+
+const CORD_THINNESS = 0.7;
+
+let COIL_RADIUS =
+    COIL_RADIUS_BASE *
+    CORD_THINNESS;
+
+let DEPTH =
+    DEPTH_BASE *
+    CORD_THINNESS;
+
+cord.setAttribute(
+    "stroke-width",
+    4 * CORD_THINNESS
+);
+
+let points = [];
+let prevPoints = [];
+
+    const BASE_CORD_OFFSET = {
+        x: 0.45,
+        y: 0.97
+    };
+
+    const PHONE_CORD_OFFSET = {
+        x: 0.45,
+        y: 0.95
+    };
+
+
+    /* =========================
+       INITIAL SETUP
+    ========================= */
+
+    contactBlock.style.display = "none";
+    guyarm.style.display = "none";
+
+const baseRect = phonebase.getBoundingClientRect();
+
+phonePos.x =
+    baseRect.left +
+    baseRect.width / 2 -
+    phone.offsetWidth / 2;
+
+phonePos.y =
+    baseRect.top +
+    baseRect.height / 2 -
+    phone.offsetHeight / 2;
+
+phone.src = "media/phoneback.png";
+
+   
+
+    /* =========================
+       EAR POSITION
+    ========================= */
+
+function positionEar(){
+
+    const guyRect =
+        guy.getBoundingClientRect();
+
+    earAnchor.style.left =
+        (guyRect.left + 290) + "px";
+
+    earAnchor.style.top =
+        (guyRect.top + 430) + "px";
+}
+
+
+    positionEar();
+
+
+    /* =========================
+       ROPE
+    ========================= */
+
+    function initRope(){
+
+        const baseRect =
+            phonebase.getBoundingClientRect();
+
+        const anchorX =
+            baseRect.left +
+            baseRect.width * BASE_CORD_OFFSET.x;
+
+        const anchorY =
+            baseRect.top +
+            baseRect.height * BASE_CORD_OFFSET.y;
+
+        points = [];
+        prevPoints = [];
+
+        for(let i = 0; i < SEGMENTS; i++){
+
+            const t = i / (SEGMENTS - 1);
+
+            const x =
+                anchorX * (1 - t) +
+                (phonePos.x +
+                 phone.offsetWidth *
+                 PHONE_CORD_OFFSET.x) * t;
+
+            const y =
+                anchorY * (1 - t) +
+                (phonePos.y +
+                 phone.offsetHeight *
+                 PHONE_CORD_OFFSET.y) * t;
+
+          points.push({
+    x:x,
+    y:y,
+    z:0
+});
+
+prevPoints.push({
+    x:x,
+    y:y,
+    z:0
+});
+        }
+    }
+
+
+    /* =========================
+       DRAGGING
+    ========================= */
+
+    phone.addEventListener("pointerdown", function(e){
+
+        e.preventDefault();
+
+        pointerId = e.pointerId;
+
+        phone.setPointerCapture(pointerId);
+
+        isMouseDown = true;
+        docked = false;
+        dockingProgress = 0;
+
+        grabbedByGuy = false;
+
+        guyarm.style.display = "none";
+
+        phoneRotation = 0;
+
+        phone.src = "media/phone.png";
+
+        offset.x =
+            e.clientX - phonePos.x;
+
+        offset.y =
+            e.clientY - phonePos.y;
+
+        document.body.style.overflow = "hidden";
+    });
+
+
+    phone.addEventListener("pointermove", function(e){
+
+        if(
+            !isMouseDown ||
+            e.pointerId !== pointerId
+        ) return;
+
+        phonePos.x =
+            e.clientX - offset.x;
+
+        phonePos.y =
+            e.clientY - offset.y;
+
+        phoneVel.x = 0;
+        phoneVel.y = 0;
+    });
+
+
+    phone.addEventListener("pointerup", endDrag);
+    phone.addEventListener("pointercancel", endDrag);
+
+
+    function endDrag(e){
+
+        if(e.pointerId !== pointerId) return;
+
+        isMouseDown = false;
+
+        pointerId = null;
+
+        document.body.style.overflow = "";
+    }
+
+
+    /* =========================
+       PHYSICS
+    ========================= */
+
+    function updatePhysics(){
+
+        positionEar();
+
+        const baseRect =
+            phonebase.getBoundingClientRect();
+
+        const anchor = {
+
+            x:
+                baseRect.left +
+                baseRect.width *
+                BASE_CORD_OFFSET.x,
+
+            y:
+                baseRect.top +
+                baseRect.height *
+                BASE_CORD_OFFSET.y
+        };
+
+
+        points[0].x = anchor.x;
+        points[0].y = anchor.y;
+
+
+        const phoneRect =
+            phone.getBoundingClientRect();
+
+        const phoneCenter = {
+
+            x:
+                phoneRect.left +
+                phoneRect.width / 2,
+
+            y:
+                phoneRect.top +
+                phoneRect.height / 2
+        };
+
+
+        const baseCenter = {
+
+            x:
+                baseRect.left +
+                baseRect.width / 2,
+
+            y:
+                baseRect.top +
+                baseRect.height / 2
+        };
+
+
+        const distToBase =
+            Math.hypot(
+                phoneCenter.x - baseCenter.x,
+                phoneCenter.y - baseCenter.y
+            );
+
+
+        /* =========================
+           PHONE ON BASE
+        ========================= */
+
+        if(docked){
+
+            phonePos.x =
+                baseCenter.x -
+                phone.offsetWidth / 2;
+
+            phonePos.y =
+                baseCenter.y -
+                phone.offsetHeight / 2;
+
+            phoneVel.x = 0;
+            phoneVel.y = 0;
+
+            phone.src =
+                "media/phoneback.png";
+        }
+
+
+        /* =========================
+           PHONE FALLING
+        ========================= */
+
+        else if(
+            !isMouseDown &&
+            !grabbedByGuy
+        ){
+
+            phoneVel.y += GRAVITY;
+
+            phoneVel.x *= DAMPING;
+            phoneVel.y *= DAMPING;
+
+            phonePos.x += phoneVel.x;
+            phonePos.y += phoneVel.y;
+
+
+            const floorY =
+                window.innerHeight - 50;
+
+
+            if(
+                phonePos.y >
+                floorY - phone.offsetHeight
+            ){
+
+                phonePos.y =
+                    floorY - phone.offsetHeight;
+
+                phoneVel.y *= -0.25;
+            }
+
+
+            if(distToBase < DOCK_RADIUS){
+
+                dockingProgress =
+                    Math.min(
+                        1,
+                        dockingProgress +
+                        DOCK_LERP
+                    );
+
+                if(dockingProgress > 0.98){
+
+                    docked = true;
+                }
+            }
+        }
+
+
+        /* =========================
+           CHECK EAR
+        ========================= */
+
+        const earRect =
+            earAnchor.getBoundingClientRect();
+
+
+        const earPoint = {
+
+            x: earRect.left,
+
+            y: earRect.top
+        };
+
+
+        const distToEar =
+            Math.hypot(
+                phoneCenter.x - earPoint.x,
+                phoneCenter.y - earPoint.y
+            );
+
+
+        /* =========================
+           PHONE REACHES EAR
+        ========================= */
+
+        if(
+            !grabbedByGuy &&
+            !docked &&
+            distToEar < 120
+        ){
+
+            grabbedByGuy = true;
+
+            phoneVel.x = 0;
+            phoneVel.y = 0;
+
+            phoneRotation =
+                EAR_ROTATION;
+
+            guyarm.style.display =
+                "block";
+
+            /* SHOW CONTACT FORM */
+
+            contactBlock.style.display =
+                "block";
+        }
+
+
+        /* =========================
+           PHONE ATTACHED TO EAR
+        ========================= */
+
+        if(grabbedByGuy){
+
+            if(distToEar <= 160){
+
+                phonePos.x =
+                    earPoint.x -
+                    phone.offsetWidth / 2;
+
+                phonePos.y =
+                    earPoint.y -
+                    phone.offsetHeight / 2;
+            }
+
+            else{
+
+                grabbedByGuy = false;
+
+                guyarm.style.display =
+                    "none";
+
+                docked = false;
+
+                phoneRotation = 0;
+
+                contactBlock.style.display =
+                    "none";
+            }
+        }
+
+
+        /* =========================
+           ROPE PHYSICS
+        ========================= */
+
+        const end =
+            points.length - 1;
+
+
+        for(
+            let i = 1;
+            i < end;
+            i++
+        ){
+
+            const p = points[i];
+            const prev = prevPoints[i];
+
+          const vx =
+    (p.x - prev.x) *
+    DAMPING;
+
+const vy =
+    (p.y - prev.y) *
+    DAMPING +
+    GRAVITY;
+
+const vz =
+    (p.z - prev.z) *
+    DAMPING;
+
+prev.x = p.x;
+prev.y = p.y;
+prev.z = p.z;
+
+p.x += vx;
+p.y += vy;
+p.z += vz;
+        }
+
+
+     /* =========================
+   	ROPE CONSTRAINTS
+	========================= */
+
+for(let k = 0; k < 1200; k++){
+
+    points[0].x = anchor.x;
+    points[0].y = anchor.y;
+
+    const attachOffset =
+        docked
+        ? PHONE_CORD_OFFSET
+        : PHONE_CORD_OFFSET;
+
+    points[end].x =
+        phonePos.x +
+        phone.offsetWidth *
+        attachOffset.x;
+
+    points[end].y =
+        phonePos.y +
+        phone.offsetHeight *
+        attachOffset.y;
+
+    for(let i = 0; i < end; i++){
+
+        const p1 = points[i];
+        const p2 = points[i + 1];
+
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dz = p2.z - p1.z;
+
+        const dist =
+            Math.sqrt(
+                dx * dx +
+                dy * dy +
+                dz * dz
+            ) || 1;
+
+        const stiffness =
+            (i > end - TAIL_SEGMENTS)
+            ? TAIL_STIFFNESS
+            : 1;
+
+        const diff =
+            (dist - SEGMENT_LENGTH) / dist;
+
+        if(i !== 0){
+
+            p1.x +=
+                dx * 0.5 *
+                diff *
+                stiffness;
+
+            p1.y +=
+                dy * 0.5 *
+                diff *
+                stiffness;
+
+            p1.z +=
+                dz * 0.5 *
+                diff *
+                stiffness;
+        }
+
+        if(i + 1 !== end){
+
+            p2.x -=
+                dx * 0.5 *
+                diff *
+                stiffness;
+
+            p2.y -=
+                dy * 0.5 *
+                diff *
+                stiffness;
+
+            p2.z -=
+                dz * 0.5 *
+                diff *
+                stiffness;
+        }
+    }
+}
+}
+
+
+    /* =========================
+       DRAW CORD
+    ========================= */
+
+ function drawCord(){
+
+    let d =
+        `M ${points[0].x} ${points[0].y}`;
+
+    for(let i = 1; i < points.length; i++){
+
+        const p = points[i];
+        const prev = points[i - 1];
+
+        /*
+         * Keep the sections immediately attached
+         * to the base and phone relatively straight.
+         */
+
+        if(
+            i < STRAIGHT_SEGMENTS_BASE ||
+            i > points.length - TAIL_SEGMENTS
+        ){
+
+            d +=
+                ` L ${p.x} ${p.y}`;
+
+            continue;
+        }
+
+        /*
+         * Calculate the direction of the rope.
+         */
+
+        const dx =
+            p.x - prev.x;
+
+        const dy =
+            p.y - prev.y;
+
+        const len =
+            Math.hypot(dx, dy) || 1;
+
+        /*
+         * Perpendicular direction.
+         * This lets us push the line sideways
+         * to create the telephone-cord coil.
+         */
+
+        const nx =
+            -dy / len;
+
+        const ny =
+            dx / len;
+
+        /*
+         * Coil phase.
+         */
+
+        const phase =
+            (i / points.length) *
+            COILS *
+            Math.PI *
+            2;
+
+        /*
+         * Coil around the rope.
+         */
+
+        const x =
+            p.x +
+            nx *
+            Math.cos(phase) *
+            COIL_RADIUS;
+
+        const y =
+            p.y +
+            ny *
+            Math.cos(phase) *
+            COIL_RADIUS +
+            Math.sin(phase) *
+            DEPTH;
+
+        d +=
+            ` L ${x} ${y}`;
+    }
+
+    cord.setAttribute("d", d);
+}
+
+
+    /* =========================
+       UPDATE PHONE
+    ========================= */
+
+    function updatePhone(){
+
+        phone.style.left =
+            phonePos.x + "px";
+
+        phone.style.top =
+            phonePos.y + "px";
+
+        phone.style.transform =
+            `rotate(${phoneRotation}deg)`;
+    }
+
+
+    /* =========================
+       ANIMATION
+    ========================= */
+
+    function animate(){
+
+        updatePhysics();
+
+        drawCord();
+
+        updatePhone();
+
+        requestAnimationFrame(
+            animate
+        );
+    }
+
+
+    initRope();
+
+    animate();
 }
 
 /* =========================
