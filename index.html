@@ -397,7 +397,7 @@ CONTACT
 #sentCheck{
     display:none;
     margin-left:10px;
-    color:green;
+    
 }
 
 /* =========================
@@ -765,6 +765,54 @@ function showContact(){
     const phone = document.getElementById("phone");
     const phonebase = document.getElementById("phonebase");
     const guy = document.getElementById("guy");
+
+const contactForm = document.getElementById("contactForm");
+const sentCheck = document.getElementById("sentCheck");
+
+contactForm.addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const formData = new FormData(contactForm);
+
+    try {
+
+        const response = await fetch("send.php", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.text();
+
+        if (response.ok) {
+
+            sentCheck.style.display = "inline";
+            sentCheck.textContent = "✓ Message sent";
+
+            contactForm.reset();
+
+            setTimeout(() => {
+                sentCheck.style.display = "none";
+            }, 3000);
+
+        } else {
+
+            sentCheck.style.display = "inline";
+            sentCheck.style.color = "red";
+            sentCheck.textContent = result || "Message did not send.";
+
+        }
+
+    } catch (error) {
+
+        sentCheck.style.display = "inline";
+        sentCheck.style.color = "red";
+        sentCheck.textContent = "Message did not send. Please try again.";
+
+        console.error(error);
+    }
+
+});
 
     Promise.all([
         new Promise(resolve => {
